@@ -1,18 +1,20 @@
 #pragma once
-template <typename S>
-class Array
+namespace spaceArray
 {
-	S *arr;
-	size_t size;
-	size_t real_size;
-public:
-	Array();
-	~Array();
+	template <typename S>
+	class Array
+	{
+		S *arr;
+		size_t size;
+		size_t real_size;
+	public:
+		Array();
+		~Array();
 
-	S operator[] (size_t i);
-	size_t Size();
-	void Push_back(S i);
-	void Pop_back();
-	void ShrinkToFit();
-};
-
+		S operator[] (size_t);
+		size_t Size();
+		void Push_back(S);
+		void Pop_back();
+		void ShrinkToFit();
+	};
+}

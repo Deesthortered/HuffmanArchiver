@@ -1,4 +1,5 @@
 #pragma once
+
 namespace spaceArray
 {
 	template <typename S>

@@ -13,7 +13,7 @@ namespace spaceArray
 	template <typename S>
 	Array<S>::~Array()
 	{
-		for (register size_t i = 0; i < this->real_size; i++) delete arr[i];
+		delete[] arr;
 		this->real_size = 0;
 		this->size = 0;
 	}
@@ -41,14 +41,12 @@ namespace spaceArray
 			size++;
 			return;
 		}
-		S *new_arr = new S[this->real_size << 1];
+		S *new_arr = new S[(this->real_size ? this->real_size << 1 : 1)];
 		for (register size_t i = 0; i < this->real_size; i++)
-		{
 			new_arr[i] = this->arr[i];
-			delete arr[i];
-		}
+		delete this->arr;
 		new_arr[size++] = elem;
-		this->real_size <<= 1;
+		this->real_size = (this->real_size ? this->real_size << 1 : 1);
 		this->arr = new_arr;
 	}
 
@@ -62,8 +60,11 @@ namespace spaceArray
 	template <typename S>
 	void Array<S>::ShrinkToFit()
 	{
-		for (register size_t i = this->size; i < this->real_size; i++)
-			delete this->arr[i];
+		S *new_arr = new S[size];
+		for (register size_t i = 0; i < this->size; i++)
+			new_arr[i] = arr[i];
 		this->real_size = this->size;
+		delete[] this->arr;
+		this->arr = new_arr;
 	}
 }

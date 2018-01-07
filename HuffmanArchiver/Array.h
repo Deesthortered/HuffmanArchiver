@@ -2,7 +2,7 @@
 
 namespace spaceArray
 {
-	template <typename S>
+	template <class S>
 	class Array
 	{
 		S *arr;
@@ -13,6 +13,7 @@ namespace spaceArray
 		~Array();
 
 		S operator[] (size_t);
+		void SetValue(size_t, S);
 		size_t Size();
 		void Push_back(S);
 		void Pop_back();

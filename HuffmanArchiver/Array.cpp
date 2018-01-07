@@ -2,7 +2,7 @@
 
 namespace spaceArray
 {
-	template <typename S>
+	template <class S>
 	Array<S>::Array()
 	{
 		this->arr = nullptr;
@@ -10,29 +10,36 @@ namespace spaceArray
 		this->real_size = 0;
 	}
 
-	template <typename S>
+	template <class S>
 	Array<S>::~Array()
 	{
-		delete[] arr;
+		S *a = arr;
+		delete[] a;
+		this->arr = nullptr;
 		this->real_size = 0;
 		this->size = 0;
 	}
 
-
-	template <typename S>
-	S Array<S>:: operator[] (size_t i)
+	template <class S>
+	S Array<S>::operator[] (size_t i)
 	{
 		if (i >= size) throw "Out of range";
 		return arr[i];
 	}
+	
+	template <class S>
+	void Array<S>::SetValue(size_t i, S val)
+	{
+		this->arr[i] = val;
+	}
 
-	template <typename S>
+	template <class S>
 	size_t Array<S>::Size()
 	{
 		return this->size;
 	}
 
-	template <typename S>
+	template <class S>
 	void Array<S>::Push_back(S elem)
 	{
 		if (size < real_size)
@@ -50,14 +57,14 @@ namespace spaceArray
 		this->arr = new_arr;
 	}
 
-	template <typename S>
+	template <class S>
 	void Array<S>::Pop_back()
 	{
 		if (!size) return;
 		size--;
 	}
 
-	template <typename S>
+	template <class S>
 	void Array<S>::ShrinkToFit()
 	{
 		S *new_arr = new S[size];

@@ -1,6 +1,8 @@
+#include <iostream>
+using namespace std;
 
-// It's main branch which we use when we have done somethings
 int main()
 {
-
+	system("pause");
+	return 0;
 }

@@ -115,11 +115,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Archiver.cpp" />
-    <ClCompile Include="Array.cpp" />
-    <ClCompile Include="AVL_Tree.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="PriorityQueue.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Archiver.h" />

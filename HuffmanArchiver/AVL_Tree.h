@@ -8,10 +8,11 @@ namespace spaceAVL_Tree
 		struct TreeNode
 		{
 			S data;
+			size_t cnt; // Special for this program
 			int height;
 			TreeNode *left;
 			TreeNode *right;
-			TreeNode(S _data) { data = _data; height = 1; left = nullptr; right = nullptr; }
+			TreeNode(S _data): data(_data), height(1), cnt(1), left(nullptr), right(nullptr) {}
 		};
 		TreeNode *main_root;
 
@@ -19,7 +20,15 @@ namespace spaceAVL_Tree
 		AVL_Tree();
 		~AVL_Tree();
 		void Insert(S);
-		void DeleteNode(S); 
+		void DeleteNode(S);
+		bool IsEmpty();
+
+		// Special for this program
+		S GetRootVal();
+		size_t GetRootCount();
+		void DeleteRoot();
+		//
+
 	private:
 		void insert(S, TreeNode *&);
 		void deleteNode(S, TreeNode *&);

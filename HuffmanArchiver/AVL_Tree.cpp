@@ -29,6 +29,31 @@ namespace spaceAVL_Tree
 		deleteNode(data, this->main_root);
 	}
 
+	template<class S>
+	bool AVL_Tree<S>::IsEmpty()
+	{
+		return (this->main_root ? true : false);
+	}
+
+	// Special for this program
+	template<class S>
+	S AVL_Tree<S>::GetRootVal()
+	{
+		return this->main_root->data;
+	}
+
+	template<class S>
+	size_t AVL_Tree<S>::GetRootCount()
+	{
+		return this->main_root->cnt;
+	}
+
+	template<class S>
+	void AVL_Tree<S>::DeleteRoot()
+	{
+		deleteNode(this->main_root->data, this->main_root);
+	}
+	//
 
 	template<class S>
 	void AVL_Tree<S>::insert(S _data, TreeNode *&root)
@@ -48,15 +73,15 @@ namespace spaceAVL_Tree
 			if (root->left != nullptr) insert(_data, root->left);
 			else root->left = new TreeNode(_data);
 		}
-		else if (_data == root->data) { return; }
+		else if (_data == root->data) { root->cnt++; return; }
 
 		root->height = (Height(root->left) > Height(root->right) ? Height(root->left) : Height(root->right)) + 1;
 		int balance = Balance(root);
 
-		if (balance > 1 && _data < root->left->data) R_rot(root);
-		else if (balance < -1 && _data > root->right->data) L_rot(root);
-		else if (balance > 1 && _data > root->left->data) LR_rot(root);
-		else if (balance < -1 && _data < root->right->data) RL_rot(root);
+		if (balance > 1 && _data < root->left->data)	{ R_rot(root); return; }
+		if (balance < -1 && _data > root->right->data)	{ L_rot(root); return; }
+		if (balance > 1 && _data > root->left->data)	{ LR_rot(root); return; }
+		if (balance < -1 && _data < root->right->data)	{ RL_rot(root); return; }
 	}
 
 	template<class S>
@@ -91,13 +116,9 @@ namespace spaceAVL_Tree
 		root->height = 1 + max(Height(root->left), Height(root->right));
 		int balance = Balance(root);
 
-		// Left Left
 		if (balance > 1 && Balance(root->left) >= 0) { R_rot(root); return; }
-		// Left Right
 		if (balance > 1 && Balance(root->left) < 0) { LR_rot(root); return; }
-		// Right Right
 		if (balance < -1 && Balance(root->right) <= 0) { L_rot(root); return; }
-		// Right Left
 		if (balance < -1 && Balance(root->right) > 0) { RL_rot(root); return; }
 	}
 

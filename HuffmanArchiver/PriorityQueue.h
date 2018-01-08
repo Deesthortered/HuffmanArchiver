@@ -1,5 +1,5 @@
 #pragma once
-#include "Array.cpp"
+#include "Array.h"
 
 namespace spacePriorityQueue
 {

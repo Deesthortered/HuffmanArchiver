@@ -64,12 +64,24 @@ namespace spaceArray
 		size--;
 	}
 
+	template<class S>
+	void Array<S>::Reserve(size_t s)
+	{
+		if (s <= this->real_size) return;
+		S *new_arr = new S[s];
+		for (register size_t i = 0; i < this->size; i++)
+			new_arr[i] = this->arr[i];
+		this->real_size = s;
+		delete[] this->arr;
+		this->arr = new_arr;
+	}
+
 	template <class S>
 	void Array<S>::ShrinkToFit()
 	{
 		S *new_arr = new S[size];
 		for (register size_t i = 0; i < this->size; i++)
-			new_arr[i] = arr[i];
+			new_arr[i] = this->arr[i];
 		this->real_size = this->size;
 		delete[] this->arr;
 		this->arr = new_arr;

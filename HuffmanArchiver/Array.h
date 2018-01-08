@@ -17,6 +17,7 @@ namespace spaceArray
 		size_t Size();
 		void Push_back(S);
 		void Pop_back();
+		void Reserve(size_t);
 		void ShrinkToFit();
 	};
 }

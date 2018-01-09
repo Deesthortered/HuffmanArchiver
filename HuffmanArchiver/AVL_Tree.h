@@ -37,7 +37,7 @@ namespace spaceAVL_Tree
 		}
 		bool IsEmpty()
 		{
-			return (this->main_root ? true : false);
+			return (this->main_root ? false : true);
 		}
 
 		// Special for this program
@@ -77,10 +77,10 @@ namespace spaceAVL_Tree
 			root->height = (Height(root->left) > Height(root->right) ? Height(root->left) : Height(root->right)) + 1;
 			int balance = Balance(root);
 
-			if (balance > 1 && _data < root->left->data) { R_rot(root); return; }
-			if (balance < -1 && _data > root->right->data) { L_rot(root); return; }
-			if (balance > 1 && _data > root->left->data) { LR_rot(root); return; }
-			if (balance < -1 && _data < root->right->data) { RL_rot(root); return; }
+			if (balance >  1 && Balance(root->left)  >= 0) { R_rot (root); return; }
+			if (balance >  1 && Balance(root->left)  <  0) { LR_rot(root); return; }
+			if (balance < -1 && Balance(root->right) <= 0) { L_rot (root); return; }
+			if (balance < -1 && Balance(root->right) >  0) { RL_rot(root); return; }
 		}
 		void deleteNode(S _data, TreeNode *&root)
 		{
@@ -105,6 +105,7 @@ namespace spaceAVL_Tree
 					TreeNode *temp = root->right;
 					while (temp->left != nullptr) temp = temp->left;
 					root->data = temp->data;
+					root->cnt = temp->cnt;
 					deleteNode(temp->data, root->right);
 				}
 			}
@@ -113,10 +114,10 @@ namespace spaceAVL_Tree
 			root->height = 1 + max(Height(root->left), Height(root->right));
 			int balance = Balance(root);
 
-			if (balance > 1 && Balance(root->left) >= 0) { R_rot(root); return; }
-			if (balance > 1 && Balance(root->left) < 0) { LR_rot(root); return; }
-			if (balance < -1 && Balance(root->right) <= 0) { L_rot(root); return; }
-			if (balance < -1 && Balance(root->right) > 0) { RL_rot(root); return; }
+			if (balance >  1 && Balance(root->left)  >= 0) { R_rot (root); return; }
+			if (balance >  1 && Balance(root->left)  <  0) { LR_rot(root); return; }
+			if (balance < -1 && Balance(root->right) <= 0) { L_rot (root); return; }
+			if (balance < -1 && Balance(root->right) >  0) { RL_rot(root); return; }
 		}
 		void clear(TreeNode *root)
 		{

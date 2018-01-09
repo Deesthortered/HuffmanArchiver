@@ -63,6 +63,7 @@ namespace spacePriorityQueue
 							this->arr.SetValue(i, a);
 							i = (i << 1) + 1;
 						}
+						else break;
 					}
 					else
 					{
@@ -73,6 +74,7 @@ namespace spacePriorityQueue
 							this->arr.SetValue(i, a);
 							i = (i << 1) + 2;
 						}
+						else break;
 					}
 				}
 				else if (this->arr[(i << 1) + 1].key < this->arr[i].key)

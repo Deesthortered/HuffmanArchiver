@@ -48,7 +48,7 @@ namespace spaceArray
 			S *new_arr = new S[(this->real_size ? this->real_size << 1 : 1)];
 			for (register size_t i = 0; i < this->real_size; i++)
 				new_arr[i] = this->arr[i];
-			delete this->arr;
+			delete[] this->arr;
 			new_arr[size++] = elem;
 			this->real_size = (this->real_size ? this->real_size << 1 : 1);
 			this->arr = new_arr;

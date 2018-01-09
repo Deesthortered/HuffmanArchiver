@@ -121,6 +121,7 @@
     <ClInclude Include="Archiver.h" />
     <ClInclude Include="Array.h" />
     <ClInclude Include="AVL_Tree.h" />
+    <ClInclude Include="BitSet.h" />
     <ClInclude Include="PriorityQueue.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

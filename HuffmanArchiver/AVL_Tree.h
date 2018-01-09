@@ -27,10 +27,10 @@ namespace spaceAVL_Tree
 			this->main_root = nullptr;
 		}
 
-		void Insert(S data)
+		bool Insert(S data)
 		{
-			insert(data, this->main_root);
-		} // Was modified special for this program
+			return insert(data, this->main_root);
+		} 
 		void DeleteNode(S data)
 		{
 			deleteNode(data, this->main_root);
@@ -41,7 +41,7 @@ namespace spaceAVL_Tree
 		}
 
 		// Special for this program
-		S GetRootVal()
+		S      GetRootVal()
 		{
 			return this->main_root->data;
 		}
@@ -49,38 +49,42 @@ namespace spaceAVL_Tree
 		{
 			return this->main_root->cnt;
 		}
-		void DeleteRoot()
+		void   DeleteRoot()
 		{
 			deleteNode(this->main_root->data, this->main_root);
 		}
 		//
+
 	private:
-		void insert(S _data, TreeNode *&root)
+		// Was modified special for this program
+		bool insert(S _data, TreeNode *&root)
 		{
 			if (!root)
 			{
 				root = new TreeNode(_data);
-				return;
+				return false;
 			}
+			bool k = false;
 			if (_data > root->data)
 			{
-				if (root->right != nullptr)	insert(_data, root->right);
+				if (root->right != nullptr) k =	insert(_data, root->right);
 				else root->right = new TreeNode(_data);
 			}
 			else if (_data < root->data)
 			{
-				if (root->left != nullptr) insert(_data, root->left);
+				if (root->left != nullptr) k = insert(_data, root->left);
 				else root->left = new TreeNode(_data);
 			}
-			else if (_data == root->data) { root->cnt++; return; }
+			else if (_data == root->data) { root->cnt++; return true; }
 
 			root->height = (Height(root->left) > Height(root->right) ? Height(root->left) : Height(root->right)) + 1;
 			int balance = Balance(root);
 
-			if (balance >  1 && Balance(root->left)  >= 0) { R_rot (root); return; }
-			if (balance >  1 && Balance(root->left)  <  0) { LR_rot(root); return; }
-			if (balance < -1 && Balance(root->right) <= 0) { L_rot (root); return; }
-			if (balance < -1 && Balance(root->right) >  0) { RL_rot(root); return; }
+			if (balance >  1 && Balance(root->left)  >= 0) { R_rot (root); return k; }
+			if (balance >  1 && Balance(root->left)  <  0) { LR_rot(root); return k; }
+			if (balance < -1 && Balance(root->right) <= 0) { L_rot (root); return k; }
+			if (balance < -1 && Balance(root->right) >  0) { RL_rot(root); return k; }
+			return k;
 		}
 		void deleteNode(S _data, TreeNode *&root)
 		{

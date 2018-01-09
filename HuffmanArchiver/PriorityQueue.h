@@ -35,9 +35,7 @@ namespace spacePriorityQueue
 			this->arr.Push_back(Pair(data, key));
 			while (i && this->arr[i].key < this->arr[(i - 1) >> 1].key)
 			{
-				Pair a = this->arr[(i - 1) >> 1];
-				this->arr.SetValue((i - 1) >> 1, this->arr[i]);
-				this->arr.SetValue(i, a);
+				swap(this->arr[(i - 1) >> 1], this->arr[i]);
 				i = (i - 1) >> 1;
 			}
 		}
@@ -47,7 +45,7 @@ namespace spacePriorityQueue
 			size_t sz = this->arr.Size() - 1;
 			size_t i = 0;
 
-			this->arr.SetValue(0, this->arr[sz]);
+			this->arr[0] = this->arr[sz];
 			this->arr.Pop_back();
 
 			while ((i << 1) + 1 < sz)
@@ -58,9 +56,7 @@ namespace spacePriorityQueue
 					{
 						if (this->arr[(i << 1) + 1].key < this->arr[i].key)
 						{
-							Pair a = this->arr[(i << 1) + 1];
-							this->arr.SetValue((i << 1) + 1, this->arr[i]);
-							this->arr.SetValue(i, a);
+							swap(this->arr[(i << 1) + 1], this->arr[i]);
 							i = (i << 1) + 1;
 						}
 						else break;
@@ -69,9 +65,7 @@ namespace spacePriorityQueue
 					{
 						if (this->arr[(i << 1) + 2].key < this->arr[i].key)
 						{
-							Pair a = this->arr[(i << 1) + 2];
-							this->arr.SetValue((i << 1) + 2, this->arr[i]);
-							this->arr.SetValue(i, a);
+							swap(this->arr[(i << 1) + 2], this->arr[i]);
 							i = (i << 1) + 2;
 						}
 						else break;
@@ -79,9 +73,7 @@ namespace spacePriorityQueue
 				}
 				else if (this->arr[(i << 1) + 1].key < this->arr[i].key)
 				{
-					Pair a = this->arr[(i << 1) + 1];
-					this->arr.SetValue((i << 1) + 1, this->arr[i]);
-					this->arr.SetValue(i, a);
+					swap(this->arr[(i << 1) + 1], this->arr[i]);
 					i = (i << 1) + 1;
 				}
 				else break;

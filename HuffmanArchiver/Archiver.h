@@ -4,10 +4,11 @@
 #include "AVL_Tree.h"
 #include "PriorityQueue.h"
 using namespace std;
+typedef unsigned long long ull;
 
 namespace spaceArchiver
 {
-	class Archiver
+	class Coder
 	{
 		struct HuffTrNode
 		{
@@ -24,14 +25,14 @@ namespace spaceArchiver
 		bool ready;
 
 	public:
-		Archiver()
+		Coder()
 		{
 			this->path_from.clear();
 			this->path_to.clear();
 			this->cnt_byte = 0;
 			this->ready = false;
 		}
-		~Archiver()
+		~Coder()
 		{
 			this->path_from.clear();
 			this->path_to.clear();
@@ -59,19 +60,19 @@ namespace spaceArchiver
 		void Run()
 		{
 			if (!this->ready) return;
-			cout << "Function is started" << endl;
-			cout << "Crate avl tree" << endl;
 
-			spaceAVL_Tree::AVL_Tree<string> tree;
 			fstream fin(this->path_from, ios::binary | ios::in);
-			char c; string word; size_t i = 0;
+			spaceAVL_Tree::AVL_Tree<string> tree, tree1;
+			char c; string word; size_t i = 0; ull cnt_codes = 0;
+
 			word.reserve(this->cnt_byte);
 			while (fin.read(&c, sizeof(c)))
 			{
 				word.push_back(c); i++;
 				if (i >= this->cnt_byte)
 				{
-					tree.Insert(word);
+					if (!tree.Insert(word)) cnt_codes++;
+					tree1.Insert(word);
 					word.clear();
 				i = 0;
 				}
@@ -80,11 +81,11 @@ namespace spaceArchiver
 			{
 				for (size_t j = 0; i < this->cnt_byte - i; j++) word.push_back('\0');
 				tree.Insert(word);
+				tree1.Insert(word);
 				word.clear(); i = 0;
 			}
 			fin.close();
-			cout << "avl tree is created" << endl;
-			cout << "create queue" << endl;
+
 
 			spacePriorityQueue::PriorityQueue<HuffTrNode, size_t> q;
 			while (!tree.IsEmpty())
@@ -95,8 +96,8 @@ namespace spaceArchiver
 				tree.DeleteRoot();
 			}
 			tree.~AVL_Tree();
-			cout << "queue is created" << endl;
-			cout << "create huffman tree" << endl;
+
+
 			HuffTrNode *hufftree;
 			while (true)
 			{
@@ -116,8 +117,8 @@ namespace spaceArchiver
 				delete tmp3;
 			}
 			q.~PriorityQueue();
-			cout << "huffman tree is created" << endl;
 			 
+			// осталось tree1 и hufftree
 
 		}
 	};

@@ -24,14 +24,10 @@ namespace spaceArray
 			this->size = 0;
 		}
 
-		S operator[] (size_t i)
+		S &operator[] (size_t i)
 		{
 			if (i >= size) throw "Out of range";
 			return arr[i];
-		}
-		void SetValue(size_t i, S val)
-		{
-			this->arr[i] = val;
 		}
 		size_t Size()
 		{

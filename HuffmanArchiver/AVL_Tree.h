@@ -1,4 +1,5 @@
 #pragma once
+#include "BitSet.h"
 
 namespace spaceAVL_Tree
 {
@@ -8,11 +9,15 @@ namespace spaceAVL_Tree
 		struct TreeNode
 		{
 			S data;
-			size_t cnt; // Special for this program
+
+			// Special for this program
+			size_t cnt; 
+			spaceBitSet::BitSet bs;
+
 			int height;
 			TreeNode *left;
 			TreeNode *right;
-			TreeNode(S _data): data(_data), height(1), cnt(1), left(nullptr), right(nullptr) {}
+			TreeNode(S _data) : data(_data), height(1), cnt(1), left(nullptr), right(nullptr) { }
 		};
 		TreeNode *main_root;
 
@@ -53,9 +58,20 @@ namespace spaceAVL_Tree
 		{
 			deleteNode(this->main_root->data, this->main_root);
 		}
+		void   SetBitSet(S val, spaceBitSet::BitSet &bs)
+		{
+			TreeNode *p = this->main_root;
+			while (p && p->data != val)
+			{
+				if (p->data < val) p = p->right;
+				else if (p->data > val) p = p->left;
+			}
+			if (!p) return;
+			p->bs = bs;
+		}
 		//
-
 	private:
+		
 		// Was modified special for this program
 		bool insert(S _data, TreeNode *&root)
 		{
@@ -85,7 +101,8 @@ namespace spaceAVL_Tree
 			if (balance < -1 && Balance(root->right) <= 0) { L_rot (root); return k; }
 			if (balance < -1 && Balance(root->right) >  0) { RL_rot(root); return k; }
 			return k;
-		}
+		} 
+
 		void deleteNode(S _data, TreeNode *&root)
 		{
 			if (!root) return;

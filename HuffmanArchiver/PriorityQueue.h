@@ -79,7 +79,7 @@ namespace spacePriorityQueue
 				else break;
 			}
 		}
-		T1 ExtractMin()
+		T1	 ExtractMin()
 		{
 			if (IsEmpty()) throw "Empty queue";
 			return this->arr[0].data;

@@ -1,6 +1,9 @@
 #pragma once
 #include <string>
 #include <fstream>
+
+#include <iostream>
+
 #include "AVL_Tree.h"
 #include "PriorityQueue.h"
 using namespace std;
@@ -117,9 +120,28 @@ namespace spaceArchiver
 				delete tmp3;
 			}
 			q.~PriorityQueue();
-			 
-			// осталось tree1 и hufftree
+			
+			spaceBitSet::BitSet bs; bs.Reserve(1);
+			size_t max_bit_size = Hufffunc(hufftree, bs, tree1) - 1;
+			hufftree = nullptr;
 
+
+		}
+	private:
+		size_t Hufffunc(HuffTrNode *&node, spaceBitSet::BitSet &bs, spaceAVL_Tree::AVL_Tree<string> &tree)
+		{
+			if (!node) return 0;
+			if (!node->data.empty()) tree.SetBitSet(node->data, bs);
+
+			spaceBitSet::BitSet l = bs;
+			spaceBitSet::BitSet r = bs;
+			l.PushBack(false);
+			r.PushBack(true);
+
+			size_t a = Hufffunc(node->left, l, tree);
+			size_t b = Hufffunc(node->right, r, tree);
+			delete node;
+			return (a < b ? b : a) + 1;
 		}
 	};
 	class Decoder

@@ -122,4 +122,17 @@ namespace spaceArchiver
 
 		}
 	};
+	class Decoder
+	{
+
+	public:
+		Decoder()
+		{
+
+		}
+		~Decoder()
+		{
+
+		}
+	};
 }

@@ -1,23 +1,32 @@
 #pragma once
+#include <string>
 #include "BitSet.h"
+#include "PriorityQueue.h"
+using namespace std;
 
 namespace spaceAVL_Tree
 {
-	template<class S>
+	struct Node
+	{
+		string data;
+		spaceBitSet::BitSet bs;
+		size_t cnt;
+		Node() = default;
+		Node(string _data, spaceBitSet::BitSet _bs, size_t _cnt) : data(_data), bs(_bs), cnt(_cnt) {}
+	};
+
 	class AVL_Tree
 	{
 		struct TreeNode
 		{
-			S data;
-
-			// Special for this program
-			size_t cnt; 
+			string data;
 			spaceBitSet::BitSet bs;
+			size_t cnt; 
 
 			int height;
 			TreeNode *left;
 			TreeNode *right;
-			TreeNode(S _data) : data(_data), height(1), cnt(1), left(nullptr), right(nullptr) { }
+			TreeNode(string _data) : data(_data), height(1), cnt(1), left(nullptr), right(nullptr) { }
 		};
 		TreeNode *main_root;
 
@@ -32,11 +41,11 @@ namespace spaceAVL_Tree
 			this->main_root = nullptr;
 		}
 
-		bool Insert(S data)
+		bool Insert(string data)
 		{
 			return insert(data, this->main_root);
 		} 
-		void DeleteNode(S data)
+		void DeleteNode(string data)
 		{
 			deleteNode(data, this->main_root);
 		}
@@ -45,20 +54,13 @@ namespace spaceAVL_Tree
 			return (this->main_root ? false : true);
 		}
 
-		// Special for this program
-		S      GetRootVal()
+		spaceArray::Array<Node> ReturnNodes()
 		{
-			return this->main_root->data;
+			spaceArray::Array<Node> ar;
+			returnnodes(this->main_root, ar);
+			return ar;
 		}
-		size_t GetRootCount()
-		{
-			return this->main_root->cnt;
-		}
-		void   DeleteRoot()
-		{
-			deleteNode(this->main_root->data, this->main_root);
-		}
-		void   SetBitSet(S val, spaceBitSet::BitSet &bs)
+		void   SetBitSet(string val, spaceBitSet::BitSet &bs)
 		{
 			TreeNode *p = this->main_root;
 			while (p && p->data != val)
@@ -69,11 +71,9 @@ namespace spaceAVL_Tree
 			if (!p) return;
 			p->bs = bs;
 		}
-		//
+
 	private:
-		
-		// Was modified special for this program
-		bool insert(S _data, TreeNode *&root)
+		bool insert(string _data, TreeNode *&root)
 		{
 			if (!root)
 			{
@@ -102,8 +102,7 @@ namespace spaceAVL_Tree
 			if (balance < -1 && Balance(root->right) >  0) { RL_rot(root); return k; }
 			return k;
 		} 
-
-		void deleteNode(S _data, TreeNode *&root)
+		void deleteNode(string _data, TreeNode *&root)
 		{
 			if (!root) return;
 			if (_data < root->data) deleteNode(_data, root->left);
@@ -147,6 +146,14 @@ namespace spaceAVL_Tree
 			clear(root->right);
 			delete root;
 		}
+		void returnnodes(TreeNode *node, spaceArray::Array<Node> &ar)
+		{
+			if (!node) return;
+			ar.Push_back(Node(node->data, node->bs, node->cnt));
+			returnnodes(node->left, ar);
+			returnnodes(node->right, ar);
+		}
+
 		inline int max(int a, int b) 
 			{ return (a > b) ? a : b; }
 		inline int Balance(TreeNode *&root)

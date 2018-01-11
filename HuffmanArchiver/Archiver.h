@@ -1,11 +1,7 @@
 #pragma once
-#include <string>
 #include <fstream>
-
 #include <iostream>
-
 #include "AVL_Tree.h"
-#include "PriorityQueue.h"
 using namespace std;
 typedef unsigned long long ull;
 
@@ -65,7 +61,7 @@ namespace spaceArchiver
 			if (!this->ready) return;
 
 			fstream fin(this->path_from, ios::binary | ios::in);
-			spaceAVL_Tree::AVL_Tree<string> tree, tree1;
+			spaceAVL_Tree::AVL_Tree tree;
 			char c; string word; size_t i = 0; ull cnt_codes = 0;
 
 			word.reserve(this->cnt_byte);
@@ -75,7 +71,6 @@ namespace spaceArchiver
 				if (i >= this->cnt_byte)
 				{
 					if (!tree.Insert(word)) cnt_codes++;
-					tree1.Insert(word);
 					word.clear();
 				i = 0;
 				}
@@ -84,22 +79,16 @@ namespace spaceArchiver
 			{
 				for (size_t j = 0; i < this->cnt_byte - i; j++) word.push_back('\0');
 				tree.Insert(word);
-				tree1.Insert(word);
 				word.clear(); i = 0;
 			}
 			fin.close();
 
 
 			spacePriorityQueue::PriorityQueue<HuffTrNode, size_t> q;
-			while (!tree.IsEmpty())
-			{
-				size_t k = tree.GetRootCount();
-				HuffTrNode t = HuffTrNode(tree.GetRootVal(), k, nullptr, nullptr);
-			  	q.Push(t, k);
-				tree.DeleteRoot();
-			}
-			tree.~AVL_Tree();
-
+			spaceArray::Array<spaceAVL_Tree::Node> arr = tree.ReturnNodes();
+			for (size_t i = 0; i < arr.Size(); i++)
+				q.Push(HuffTrNode(arr[i].data, arr[i].cnt, nullptr, nullptr), arr[i].cnt);
+			
 
 			HuffTrNode *hufftree;
 			while (true)
@@ -122,16 +111,18 @@ namespace spaceArchiver
 			q.~PriorityQueue();
 			
 			spaceBitSet::BitSet bs; bs.Reserve(1);
-			size_t max_bit_size = Hufffunc(hufftree, bs, tree1) - 1;
+			size_t max_bit_size = Hufffunc(hufftree, bs, tree) - 1;
 			hufftree = nullptr;
+			bs.~BitSet();
 
-
+			// cnt_codes, max_bit_size, tree, arr
 		}
 	private:
-		size_t Hufffunc(HuffTrNode *&node, spaceBitSet::BitSet &bs, spaceAVL_Tree::AVL_Tree<string> &tree)
+		size_t Hufffunc(HuffTrNode *&node, spaceBitSet::BitSet &bs, spaceAVL_Tree::AVL_Tree &tree)
 		{
 			if (!node) return 0;
-			if (!node->data.empty()) tree.SetBitSet(node->data, bs);
+			if (!node->data.empty())
+				tree.SetBitSet(node->data, bs);				
 
 			spaceBitSet::BitSet l = bs;
 			spaceBitSet::BitSet r = bs;

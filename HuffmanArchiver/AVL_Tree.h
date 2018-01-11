@@ -60,7 +60,7 @@ namespace spaceAVL_Tree
 			returnnodes(this->main_root, ar);
 			return ar;
 		}
-		void   SetBitSet(string val, spaceBitSet::BitSet &bs)
+		void SetBitSet(string val, spaceBitSet::BitSet &bs)
 		{
 			TreeNode *p = this->main_root;
 			while (p && p->data != val)
@@ -70,6 +70,16 @@ namespace spaceAVL_Tree
 			}
 			if (!p) return;
 			p->bs = bs;
+		}
+		spaceBitSet::BitSet FindBitSet(string data)
+		{
+			TreeNode *p = this->main_root;
+			while (p->data != data)
+			{
+				if (p->data < data) p = p->right;
+				else if (p->data > data) p = p->left;
+			}
+			return p->bs;
 		}
 
 	private:

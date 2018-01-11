@@ -142,6 +142,24 @@ namespace spaceBitSet
 			this->bit_size--;
 		}
 
+		void GetMemory(char *buff)
+		{
+			for (size_t i = 0; i < this->byte_size; i++)
+				buff[i] = this->arr[i];
+		}
+		void ConcatSet(BitSet &bs)
+		{
+			size_t n = this->bit_size + bs.bit_size;
+			if (n < (this->byte_size << 3))
+			{
+				for (size_t i = 0; i < bs.bit_size; i++)
+					this->arr[this->bit_size + i] = bs.arr[i];
+				this->bit_size = n;
+				return;
+			}
+
+		}
+
 		friend bool operator< (BitSet &a, BitSet &b) 
 		{
 			size_t sz = (a.bit_size < b.bit_size ? a.bit_size : b.bit_size);

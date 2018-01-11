@@ -59,37 +59,37 @@ namespace spaceArchiver
 		void Run()
 		{
 			if (!this->ready) return;
-
+			/// 1 step
 			fstream fin(this->path_from, ios::binary | ios::in);
 			spaceAVL_Tree::AVL_Tree tree;
-			char c; string word; size_t i = 0; ull cnt_codes = 0;
+			char c; string word; size_t _i = 0; ull cnt_codes = 0;
 
 			word.reserve(this->cnt_byte);
 			while (fin.read(&c, sizeof(c)))
 			{
-				word.push_back(c); i++;
-				if (i >= this->cnt_byte)
+				word.push_back(c); _i++;
+				if (_i >= this->cnt_byte)
 				{
 					if (!tree.Insert(word)) cnt_codes++;
 					word.clear();
-				i = 0;
+				_i = 0;
 				}
 			}
-			if (i)
+			if (_i)
 			{
-				for (size_t j = 0; i < this->cnt_byte - i; j++) word.push_back('\0');
+				for (size_t j = 0; _i < this->cnt_byte - _i; j++) word.push_back('\0');
 				tree.Insert(word);
-				word.clear(); i = 0;
+				word.clear(); _i = 0;
 			}
 			fin.close();
 
-
+			/// 2 step
 			spacePriorityQueue::PriorityQueue<HuffTrNode, size_t> q;
 			spaceArray::Array<spaceAVL_Tree::Node> arr = tree.ReturnNodes();
 			for (size_t i = 0; i < arr.Size(); i++)
 				q.Push(HuffTrNode(arr[i].data, arr[i].cnt, nullptr, nullptr), arr[i].cnt);
 			
-
+			/// 3 step
 			HuffTrNode *hufftree;
 			while (true)
 			{
@@ -110,15 +110,64 @@ namespace spaceArchiver
 			}
 			q.~PriorityQueue();
 			
+			/// 4 step
 			spaceBitSet::BitSet bs; bs.Reserve(1);
-			size_t max_bit_size = Hufffunc(hufftree, bs, tree) - 1;
+			unsigned char max_bit_size = Hufffunc(hufftree, bs, tree) - 1;
+			unsigned char max_byte_size = (max_bit_size >> 3) + ((max_bit_size - ((max_bit_size >> 3) << 3)) ? 1 : 0);
 			hufftree = nullptr;
 			bs.~BitSet();
 
+			/// 5 step
 			// cnt_codes, max_bit_size, tree, arr
+			fstream fout(this->path_to, ios::binary | ios::out);
+
+			fout.write((char*)&cnt_codes, sizeof(cnt_codes));			// ull
+			fout.write((char*)&this->cnt_byte, sizeof(this->cnt_byte)); // size_t
+			fout.write((char*)&max_byte_size, sizeof(max_byte_size));	// unsigned char
+
+			size_t sz = arr.Size();
+			char *buff = new char[max_byte_size];
+			for (size_t i = 0; i < sz; i++)
+			{
+				for (size_t j = 0; j < this->cnt_byte; j++) 
+					fout.write((char*)&arr[i].data[j], sizeof(char));
+				fout.write((char*)&max_bit_size, sizeof(max_bit_size));
+				arr[i].bs.GetMemory(buff);
+				for (size_t j = 0; j < max_byte_size; j++)
+					fout.write((char*)&buff, sizeof(char));
+			}
+			delete[] buff;
+			arr.~Array();
+
+			/// 6 step
+			size_t bs_size = 2 * (max_bit_size < 8 ? 8 : max_bit_size);
+			spaceBitSet::BitSet temp_bs(bs_size);
+			fin.open(this->path_from, ios::binary | ios::in);
+			
+			_i = 0; word.clear();
+			while (fin.read(&c, sizeof(c)))
+			{
+				word.push_back(c); _i++;
+				if (_i >= this->cnt_byte)
+				{
+					// 
+					word.clear();
+					_i = 0;
+				}
+			}
+			if (_i)
+			{
+				for (size_t j = 0; _i < this->cnt_byte - _i; j++) word.push_back('\0');
+				//
+				word.clear(); _i = 0;
+			}
+
+
+			fin.close();
+			fout.close();
 		}
 	private:
-		size_t Hufffunc(HuffTrNode *&node, spaceBitSet::BitSet &bs, spaceAVL_Tree::AVL_Tree &tree)
+		unsigned char Hufffunc(HuffTrNode *&node, spaceBitSet::BitSet &bs, spaceAVL_Tree::AVL_Tree &tree)
 		{
 			if (!node) return 0;
 			if (!node->data.empty())
@@ -129,8 +178,8 @@ namespace spaceArchiver
 			l.PushBack(false);
 			r.PushBack(true);
 
-			size_t a = Hufffunc(node->left, l, tree);
-			size_t b = Hufffunc(node->right, r, tree);
+			unsigned char a = Hufffunc(node->left, l, tree);
+			unsigned char b = Hufffunc(node->right, r, tree);
 			delete node;
 			return (a < b ? b : a) + 1;
 		}

@@ -21,21 +21,30 @@ int main()
 
 	spaceBitSet::BitSet bs;
 	bs.PushBack(true);
-	bs.PushBack(false);
 	bs.PushBack(true);
 	bs.PushBack(false);
 	bs.PushBack(false);
 	bs.PushBack(true);
 	bs.PushBack(true);
+	bs.PushBack(false);
 	for (size_t i = 0; i < bs.BitSize(); i++)
 		cout << bs.GetValue(i); cout << endl;
 
 	spaceBitSet::BitSet bs1;
 	bs1.PushBack(false);
+	bs1.PushBack(false);
+	bs1.PushBack(false);
+	bs1.PushBack(false);
+	bs1.PushBack(true);
+	bs1.PushBack(true);
 	bs1.PushBack(true);
 	bs1.PushBack(true);
 	bs1.PushBack(false);
 	bs1.PushBack(false);
+	bs1.PushBack(false);
+	bs1.PushBack(false);
+
+
 	for (size_t i = 0; i < bs1.BitSize(); i++)
 		cout << bs1.GetValue(i); cout << endl;
 

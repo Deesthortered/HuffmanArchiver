@@ -149,23 +149,26 @@ namespace spaceBitSet
 		}
 		void ConcatSet(BitSet &bs)
 		{
-			size_t n = this->bit_size + bs.bit_size;
-			if (n < (this->byte_size << 3))
+			if (!bs.bit_size) return;
+			size_t d = ((this->byte_size << 3) - this->bit_size) % 8;
+			size_t f_end = (this->bit_size >> 3) + (this->bit_size % 8 ? 1 : 0);
+			if (bs.bit_size <= d)
 			{
-				for (size_t i = 0; i < bs.bit_size; i++)
-					this->arr[this->bit_size + i] = bs.arr[i];
-				this->bit_size = n;
+				this->arr[f_end - 1] = (this->arr[f_end - 1] & (1 << this->bit_size) - 1) | ((((1 << bs.bit_size) - 1) & bs.arr[0]) << this->bit_size);
+				this->bit_size += bs.bit_size;
 				return;
 			}
-			char *r = new char[n];
-			for (size_t i = 0; i < this->bit_size; i++)
-				r[i] = this->arr[i];
-			for (size_t i = 0; i < bs.bit_size; i++)
-				r[this->bit_size + i] = bs.arr[i];
-			delete[] this->arr;
-			this->arr = r;
-			this->bit_size = n;
-			this->byte_size = (n >> 3) + (n - ((n >> 3) << 3) ? 1 : 0);
+			Reserve(this->bit_size + bs.bit_size + 8);
+			if (d)
+			{
+				this->arr[f_end - 1] = (this->arr[f_end - 1] & ((1 << (8 - d)) - 1)) | ((((1 << d) - 1) & bs.arr[0]) << (8 - d));
+				bs.MoveLeft(d);
+				this->bit_size += d;
+			}
+			for (size_t i = 0; i < bs.byte_size - 1; i++)
+				this->arr[f_end + i] = bs.arr[i];
+			this->arr[f_end + bs.byte_size - 1] = bs.arr[bs.byte_size - 1];
+			this->bit_size += bs.bit_size;
 		}
 		void MoveLeft(size_t n)
 		{
@@ -186,15 +189,14 @@ namespace spaceBitSet
 			}	
 			if (a && !b)
 			{
-				size_t k = n >> 3;
-				for (size_t i = 0; i < this->byte_size - k; i++)
-					this->arr[i] = this->arr[i + k];
-				memset(this->arr + this->byte_size - k, 0, k);
+				for (size_t i = 0; i < this->byte_size - a; i++)
+					this->arr[i] = this->arr[i + a];
+				memset(this->arr + this->byte_size - a, 0, a);
 				this->bit_size -= n;
 				return;
 			}
 			for (size_t i = 0; i < this->byte_size - 1; i++)
-				this->arr[i] = (this->arr[i] >> b) & (127 >> (b-1)) | (((127 >> (8 - b - 1)) & this->arr[i + 1]) << (8 - b));
+				this->arr[i] = (this->arr[i] >> b) & (127 >> (b - 1)) | (((127 >> (8 - b - 1)) & this->arr[i + 1]) << (8 - b));
 			this->bit_size -= n;
 		}
 

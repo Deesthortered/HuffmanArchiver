@@ -157,7 +157,45 @@ namespace spaceBitSet
 				this->bit_size = n;
 				return;
 			}
-
+			char *r = new char[n];
+			for (size_t i = 0; i < this->bit_size; i++)
+				r[i] = this->arr[i];
+			for (size_t i = 0; i < bs.bit_size; i++)
+				r[this->bit_size + i] = bs.arr[i];
+			delete[] this->arr;
+			this->arr = r;
+			this->bit_size = n;
+			this->byte_size = (n >> 3) + (n - ((n >> 3) << 3) ? 1 : 0);
+		}
+		void MoveLeft(size_t n)
+		{
+			if (!n) return;
+			if (n >= this->bit_size)
+			{
+				memset(this->arr, 0, this->byte_size);
+				this->bit_size = 0;
+				return;
+			}
+			size_t a = n >> 3;
+			size_t b = n - (a << 3);
+			if (a && b)
+			{
+				MoveLeft(a << 3);
+				MoveLeft(b);
+				return;
+			}	
+			if (a && !b)
+			{
+				size_t k = n >> 3;
+				for (size_t i = 0; i < this->byte_size - k; i++)
+					this->arr[i] = this->arr[i + k];
+				memset(this->arr + this->byte_size - k, 0, k);
+				this->bit_size -= n;
+				return;
+			}
+			for (size_t i = 0; i < this->byte_size - 1; i++)
+				this->arr[i] = (this->arr[i] >> b) & (127 >> (b-1)) | (((127 >> (8 - b - 1)) & this->arr[i + 1]) << (8 - b));
+			this->bit_size -= n;
 		}
 
 		friend bool operator< (BitSet &a, BitSet &b) 
@@ -180,5 +218,6 @@ namespace spaceBitSet
 				this->arr[i] = obj.arr[i];
 			return *this;
 		}
-	};
+
+};
 }

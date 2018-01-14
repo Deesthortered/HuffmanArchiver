@@ -16,6 +16,7 @@ namespace spacePriorityQueue
 		spaceArray::Array<Pair> arr;
 
 	public:
+		// one trouble
 		PriorityQueue()
 		{
 			this->arr.~Array();

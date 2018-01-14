@@ -54,6 +54,7 @@ namespace spaceAVL_Tree
 			return (this->main_root ? false : true);
 		}
 
+		// modified
 		spaceArray::Array<Node> ReturnNodes()
 		{
 			spaceArray::Array<Node> ar;
@@ -81,8 +82,10 @@ namespace spaceAVL_Tree
 			}
 			return p->bs;
 		}
+		//
 
 	private:
+		// modified
 		bool insert(string _data, TreeNode *&root)
 		{
 			if (!root)
@@ -156,6 +159,7 @@ namespace spaceAVL_Tree
 			clear(root->right);
 			delete root;
 		}
+		// modified
 		void returnnodes(TreeNode *node, spaceArray::Array<Node> &ar)
 		{
 			if (!node) return;

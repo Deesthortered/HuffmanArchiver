@@ -23,6 +23,7 @@ namespace spaceArray
 			for (size_t i = 0; i < this->size; i++)
 				this->arr[i] = obj.arr[i];
 		}
+		// one trouble
 		~Array()
 		{
 			T *a = arr;

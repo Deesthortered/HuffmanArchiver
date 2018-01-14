@@ -147,6 +147,13 @@ namespace spaceBitSet
 			for (size_t i = 0; i < this->byte_size; i++)
 				buff[i] = this->arr[i];
 		}
+		void SetMemory(char *buff, size_t bit_sz)
+		{
+			Reserve(bit_sz);
+			this->bit_size = bit_sz;
+			for (size_t i = 0; i < ((bit_sz >> 3) + (bit_sz % 8 ? 1 : 0)); i++)
+				this->arr[i] = buff[i];
+		}
 		char GetFirstByte()
 		{
 			return this->arr[0];
@@ -224,6 +231,5 @@ namespace spaceBitSet
 				this->arr[i] = obj.arr[i];
 			return *this;
 		}
-
 };
 }

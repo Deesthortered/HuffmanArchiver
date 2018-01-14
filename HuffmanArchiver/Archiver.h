@@ -3,7 +3,6 @@
 #include <iostream>
 #include "AVL_Tree.h"
 using namespace std;
-typedef unsigned long long ull;
 
 namespace spaceArchiver
 {
@@ -20,7 +19,7 @@ namespace spaceArchiver
 		};
 		string path_from;
 		string path_to;
-		size_t cnt_byte;
+		unsigned char cnt_byte;
 		bool ready;
 
 	public:
@@ -43,7 +42,7 @@ namespace spaceArchiver
 		{
 			return this->ready;
 		}
-		void Initialize(string from, string to, size_t cnt)
+		void Initialize(string from, string to, unsigned char cnt)
 		{
 			if (from.empty() || to.empty()) return;
 			fstream f(from);
@@ -62,7 +61,7 @@ namespace spaceArchiver
 			/// 1 step
 			fstream fin(this->path_from, ios::binary | ios::in);
 			spaceAVL_Tree::AVL_Tree tree;
-			char c; string word; size_t _i = 0; ull cnt_codes = 0;
+			char c; string word; size_t _i = 0; unsigned __int32 cnt_codes = 0;
 
 			word.reserve(this->cnt_byte);
 			while (fin.read(&c, sizeof(c)))
@@ -121,9 +120,9 @@ namespace spaceArchiver
 			// cnt_codes, max_bit_size, tree, arr
 			fstream fout(this->path_to, ios::binary | ios::out);
 
-			fout.write((char*)&cnt_codes, sizeof(cnt_codes));			// ull
-			fout.write((char*)&this->cnt_byte, sizeof(this->cnt_byte)); // size_t
-			fout.write((char*)&max_byte_size, sizeof(max_byte_size));	// unsigned char
+			fout.write((char*)&cnt_codes, sizeof(cnt_codes));			// unsigned __int32 - 4 byte
+			fout.write((char*)&this->cnt_byte, sizeof(this->cnt_byte)); // unsigned char    - 1 byte
+			fout.write((char*)&max_byte_size, sizeof(max_byte_size));	// unsigned char    - 1 byte
 
 			size_t sz = arr.Size();
 			char *buff = new char[max_byte_size];
@@ -141,7 +140,8 @@ namespace spaceArchiver
 
 			/// 6 step
 			size_t bs_size = 2 * (max_bit_size < 8 ? 8 : max_bit_size);
-			spaceBitSet::BitSet temp_bs(bs_size);
+			spaceBitSet::BitSet temp_bs;
+			temp_bs.Reserve(bs_size);
 			fin.open(this->path_from, ios::binary | ios::in);
 			
 			_i = 0; word.clear();
@@ -150,19 +150,39 @@ namespace spaceArchiver
 				word.push_back(c); _i++;
 				if (_i >= this->cnt_byte)
 				{
-					// 
+					spaceBitSet::BitSet tmp = tree.FindBitSet(word);
+					temp_bs.ConcatSet(tmp);
 					word.clear();
 					_i = 0;
+					if (temp_bs.BitSize() >= 8)
+					{
+						char c = temp_bs.GetFirstByte();
+						fout.write(&c, sizeof(char));
+						temp_bs.MoveLeft(8);
+					}
 				}
 			}
 			if (_i)
 			{
 				for (size_t j = 0; _i < this->cnt_byte - _i; j++) word.push_back('\0');
-				//
-				word.clear(); _i = 0;
+				spaceBitSet::BitSet tmp = tree.FindBitSet(word);
+				temp_bs.ConcatSet(tmp);
+				word.clear();
+				_i = 0;
+				while (temp_bs.BitSize() >= 8)
+				{
+					char c = temp_bs.GetFirstByte();
+					fout.write(&c, sizeof(char));
+					temp_bs.MoveLeft(8);
+				}
+				if (temp_bs.BitSize())
+				{
+					size_t tmp = 8 - temp_bs.BitSize();
+					for (size_t i = 0; i < tmp; i++)  temp_bs.PushBack(false);
+					char c = temp_bs.GetFirstByte();
+					fout.write(&c, sizeof(char));
+				}
 			}
-
-
 			fin.close();
 			fout.close();
 		}

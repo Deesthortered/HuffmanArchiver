@@ -61,7 +61,7 @@ namespace spaceBitSet
 		}
 		void Reserve(size_t bit_sz)
 		{
-			if (bit_sz < this->bit_size) return;
+			if (bit_sz < (this->byte_size << 3)) return;
 			size_t byte_sz = (bit_sz >> 3) + ((bit_sz - ((bit_sz >> 3) << 3)) ? 1 : 0);
 			char *new_arr = new char[byte_sz];
 			for (size_t i = 0; i < this->byte_size; i++)
@@ -146,6 +146,10 @@ namespace spaceBitSet
 		{
 			for (size_t i = 0; i < this->byte_size; i++)
 				buff[i] = this->arr[i];
+		}
+		char GetFirstByte()
+		{
+			return this->arr[0];
 		}
 		void ConcatSet(BitSet &bs)
 		{

@@ -17,17 +17,16 @@ namespace spaceArray
 		}
 		Array(const Array &obj)
 		{
+			if (this->real_size) delete[] this->arr;
 			this->size = obj.size;
 			this->real_size = obj.real_size;
 			this->arr = new T[this->real_size];
 			for (size_t i = 0; i < this->size; i++)
 				this->arr[i] = obj.arr[i];
 		}
-		// one trouble
 		~Array()
 		{
-			T *a = arr;
-			delete[] a;
+			delete[] this->arr;
 			this->arr = nullptr;
 			this->real_size = 0;
 			this->size = 0;
@@ -50,8 +49,7 @@ namespace spaceArray
 		{
 			if (size < real_size)
 			{
-				this->arr[size] = elem;
-				size++;
+				this->arr[size++] = elem;
 				return;
 			}
 			T *new_arr = new T[(this->real_size ? this->real_size << 1 : 1)];
@@ -79,6 +77,7 @@ namespace spaceArray
 		}
 		void ShrinkToFit()
 		{
+			if (this->size == this->real_size) return;
 			T *new_arr = new T[size];
 			for (register size_t i = 0; i < this->size; i++)
 				new_arr[i] = this->arr[i];
@@ -89,11 +88,12 @@ namespace spaceArray
 
 		Array& operator=(Array &obj)
 		{
+			if (this->byte_size) delete[] this->arr;
 			this->size = obj.size;
 			this->real_size = obj.real_size;
 			this->arr = new T[this->real_size];
 			for (size_t i = 0; i < this->size; i++)
-				this->arr[i] = obj->arr[i];
+				this->arr[i] = obj.arr[i];
 			return *this;
 		}
 	};

@@ -11,12 +11,14 @@ namespace spaceBitSet
 	public:
 		BitSet()
 		{
+			if (this->byte_size) delete[] this->arr;
 			this->arr = nullptr;
 			this->bit_size = 0;
 			this->byte_size = 0;
 		}
 		BitSet(size_t bit_sz)
 		{
+			if (this->byte_size) delete[] this->arr;
 			size_t byte_sz = bit_sz / 8 + (bit_sz % 8 ? 1 : 0);
 			this->arr = new char[byte_size];
 			this->byte_size = byte_sz;
@@ -24,6 +26,7 @@ namespace spaceBitSet
 		}
 		BitSet(const BitSet &obj)
 		{
+			if (this->byte_size) delete[] this->arr;
 			this->byte_size = obj.byte_size;
 			this->bit_size = obj.bit_size;
 			this->arr = new char[this->byte_size];
@@ -32,25 +35,25 @@ namespace spaceBitSet
 		}
 		~BitSet()
 		{
-			if (!this->byte_size) return;
-			delete[] this->arr;
+			if (this->byte_size) delete[] this->arr;
+			this->arr = nullptr;
 			this->bit_size = 0;
 			this->byte_size = 0;
 		}
 
 		void Resize(size_t bit_sz)
 		{
-			if (!bit_sz)
-			{
-				this->~BitSet();
-				return;
-			}
-			if (this->byte_size << 3 > bit_sz)
+			if ((this->byte_size << 3) > bit_sz)
 			{
 				this->bit_size = bit_sz;
 				return;
 			}
 			size_t byte_sz = (bit_sz >> 3) + ( (bit_sz - ((bit_sz >> 3) << 3)) ? 1 : 0);
+			if (byte_sz <= this->byte_size)
+			{
+				this->bit_size = bit_sz;
+				return;
+			}
 			char *new_arr = new char[byte_sz];
 			for (size_t i = 0; i < this->byte_size; i++)
 				new_arr[i] = this->arr[i];
@@ -63,6 +66,7 @@ namespace spaceBitSet
 		{
 			if (bit_sz < (this->byte_size << 3)) return;
 			size_t byte_sz = (bit_sz >> 3) + ((bit_sz - ((bit_sz >> 3) << 3)) ? 1 : 0);
+			if (byte_sz <= this->byte_size) return;
 			char *new_arr = new char[byte_sz];
 			for (size_t i = 0; i < this->byte_size; i++)
 				new_arr[i] = this->arr[i];
@@ -73,6 +77,7 @@ namespace spaceBitSet
 		void ShrinkToFit()
 		{
 			size_t byte_sz = (this->bit_size >> 3) + ( (this->bit_size - ((this->bit_size >> 3) << 3)) ? 1 : 0);
+			if (byte_sz == this->byte_size) return;
 			char *new_arr = new char[byte_sz];
 			for (size_t i = 0; i < byte_sz; i++)
 				new_arr[i] = this->arr[i];
@@ -95,23 +100,15 @@ namespace spaceBitSet
 			if (this->bit_size <= iter) throw "Out of range";
 			size_t i1 = iter >> 3;
 			size_t i2 = iter - ((iter >> 3) << 3);
-			char c = 1;
-			while (i2) { c <<= 1; i2--; }
-			return this->arr[i1] & c;
+			return this->arr[i1] & (1 << i2);
 		}
 		void SetValue(size_t iter, bool val)
 		{
 			if (this->bit_size <= iter) return;
 			size_t i1 = iter >> 3;
 			size_t i2 = iter - ((iter >> 3) << 3);
-			char c = 1;
-			while (i2) { c <<= 1; i2--; }
-			if (val) this->arr[i1] = this->arr[i1] | c;
-			else
-			{
-				c = ~c;
-				this->arr[i1] = this->arr[i1] & c;
-			}
+			if (val) this->arr[i1] = this->arr[i1] | (1 << i2);
+			else this->arr[i1] = this->arr[i1] & (-2 << i2);
 		}
 
 		void PushBack(bool val)
@@ -149,8 +146,7 @@ namespace spaceBitSet
 		}
 		void SetMemory(char *buff, size_t bit_sz)
 		{
-			Reserve(bit_sz);
-			this->bit_size = bit_sz;
+			Resize(bit_sz);
 			for (size_t i = 0; i < ((bit_sz >> 3) + (bit_sz % 8 ? 1 : 0)); i++)
 				this->arr[i] = buff[i];
 		}
@@ -211,6 +207,16 @@ namespace spaceBitSet
 			this->bit_size -= n;
 		}
 
+		BitSet& operator=(BitSet &obj)
+		{
+			if (this->byte_size) delete[] this->arr;
+			this->byte_size = obj.byte_size;
+			this->bit_size = obj.bit_size;
+			this->arr = new char[this->byte_size];
+			for (size_t i = 0; i < this->byte_size; i++)
+				this->arr[i] = obj.arr[i];
+			return *this;
+		}
 		friend bool operator< (BitSet &a, BitSet &b) 
 		{
 			size_t sz = (a.bit_size < b.bit_size ? a.bit_size : b.bit_size);
@@ -222,14 +228,23 @@ namespace spaceBitSet
 			if (b.bit_size > a.bit_size) return true;
 			return false;
 		}
-		BitSet& operator=(BitSet &obj)
+		friend bool operator> (BitSet &a, BitSet &b)
 		{
-			this->byte_size = obj.byte_size;
-			this->bit_size = obj.bit_size;
-			this->arr = new char[this->byte_size];
-			for (size_t i = 0; i < this->byte_size; i++)
-				this->arr[i] = obj.arr[i];
-			return *this;
+			size_t sz = (a.bit_size < b.bit_size ? a.bit_size : b.bit_size);
+			for (size_t i = 0; i < sz; i++)
+			{
+				if (a.GetValue(i) && !b.GetValue(i)) return true;
+				if (!a.GetValue(i) && b.GetValue(i)) return false;
+			}
+			if (b.bit_size > a.bit_size) return false;
+			return false;
 		}
-};
+		bool operator == (BitSet &obj)
+		{
+			if (this->bit_size != obj.bit_size) return false;
+			for (size_t i = 0; i < this->bit_size; i++)
+				if (this->GetValue(i) != obj.GetValue(i)) return false;
+			return true;
+		}
+	};
 }

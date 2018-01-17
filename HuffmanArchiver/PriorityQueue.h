@@ -16,7 +16,6 @@ namespace spacePriorityQueue
 		spaceArray::Array<Pair> arr;
 
 	public:
-		// one trouble
 		PriorityQueue()
 		{
 			this->arr.~Array();
@@ -28,7 +27,7 @@ namespace spacePriorityQueue
 
 		bool IsEmpty()
 		{
-			return (this->arr.Size() ? false : true);
+			return (this->arr.IsEmpty() ? true : false);
 		}
 		void Push(T1 data, T2 key)
 		{

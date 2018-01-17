@@ -5,7 +5,7 @@ using namespace std;
 int main()
 {
 	unsigned char byte = 1;
-	string input = "D://2.Programming//1.txt";
+	string input = "D://2.Programming//1.pdf";
 	string output = "D://2.Programming//1.compr";
 
 	remove(output.c_str());

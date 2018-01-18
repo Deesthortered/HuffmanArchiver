@@ -17,6 +17,7 @@ namespace spaceArray
 		}
 		Array(const Array &obj)
 		{
+			if (!obj.real_size) { this->~Array(); return; }
 			this->size = obj.size;
 			this->real_size = obj.real_size;
 			this->arr = new T[this->real_size];
@@ -92,6 +93,7 @@ namespace spaceArray
 
 		Array& operator=(Array &obj)
 		{
+			if (!obj.real_size) { this->~Array(); return; }
 			if (this->real_size) delete[] this->arr;
 			this->size = obj.size;
 			this->real_size = obj.real_size;

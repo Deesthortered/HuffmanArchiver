@@ -18,7 +18,7 @@ namespace spaceBitSet
 		BitSet(size_t bit_sz)
 		{
 			size_t byte_sz = bit_sz / 8 + (bit_sz % 8 ? 1 : 0);
-			this->arr = new char[byte_size];
+			if (byte_sz) this->arr = new char[byte_size];
 			this->byte_size = byte_sz;
 			this->bit_size = bit_sz;
 		}
@@ -26,9 +26,12 @@ namespace spaceBitSet
 		{
 			this->byte_size = obj.byte_size;
 			this->bit_size = obj.bit_size;
-			this->arr = new char[this->byte_size];
-			for (size_t i = 0; i < this->byte_size; i++)
-				this->arr[i] = obj.arr[i];
+			if (obj.byte_size)
+			{
+				this->arr = new char[this->byte_size];
+				for (size_t i = 0; i < this->byte_size; i++)
+					this->arr[i] = obj.arr[i];
+			}
 		}
 		~BitSet()
 		{
@@ -209,9 +212,12 @@ namespace spaceBitSet
 			if (this->byte_size) delete[] this->arr;
 			this->byte_size = obj.byte_size;
 			this->bit_size = obj.bit_size;
-			this->arr = new char[this->byte_size];
-			for (size_t i = 0; i < this->byte_size; i++)
-				this->arr[i] = obj.arr[i];
+			if (obj.byte_size)
+			{
+				this->arr = new char[this->byte_size];
+				for (size_t i = 0; i < this->byte_size; i++)
+					this->arr[i] = obj.arr[i];
+			}
 			return *this;
 		}
 		friend bool operator< (BitSet &a, BitSet &b) 

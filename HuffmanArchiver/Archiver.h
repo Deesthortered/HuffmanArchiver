@@ -136,10 +136,8 @@ namespace spaceArchiver
 			}
 			fin.close();
 
-			/*
 			cout << "     Tree is created" << endl;
 			cout << "3/6) Create Huffman tree" << endl;
-
 			
 			/// 2 step
 			spacePriorityQueue::PriorityQueue<HuffTrNode, size_t> q;
@@ -257,7 +255,6 @@ namespace spaceArchiver
 			tree.~AVL_Tree();
 			temp_bs.~BitSet();
 			cout << "     File has already written" << endl;
-			*/
 		}
 
 	private:

@@ -32,6 +32,11 @@ namespace spaceArchiver
 			}
 			DataNode(string _data) : data(_data), cnt(1) { bs.~BitSet(); }
 			DataNode(string _data, spaceBitSet::BitSet _bs) : data(_data), bs(_bs), cnt(1) {}
+			~DataNode()
+			{
+				data.clear();
+				bs.~BitSet();
+			}
 			friend bool operator< (DataNode &a, DataNode &b)
 			{
 				return (a.data < b.data);
@@ -104,13 +109,13 @@ namespace spaceArchiver
 		{
 			if (!this->ready) return;
 			/// 1 step
-			cout << "0/9) Initializing" << endl;
+			cout << "1/6) Initializing" << endl;
 
 			fstream fin(this->path_from, ios::binary | ios::in);
 			spaceAVL_Tree::AVL_Tree<DataNode> tree;
 			char c; string word; size_t _i = 0; unsigned __int32 cnt_codes = 0;
 
-			cout << "1/9) Reading file and creating avl tree" << endl;
+			cout << "2/6) Reading file and creating avl tree" << endl;
 
 			word.reserve(this->cnt_byte);
 			while (fin.read(&c, sizeof(c)))
@@ -131,9 +136,11 @@ namespace spaceArchiver
 			}
 			fin.close();
 
+			/*
 			cout << "     Tree is created" << endl;
-			cout << "2/9) Create Huffman tree" << endl;
+			cout << "3/6) Create Huffman tree" << endl;
 
+			
 			/// 2 step
 			spacePriorityQueue::PriorityQueue<HuffTrNode, size_t> q;
 			spaceArray::Array<DataNode> arr = tree.ReturnAllVals();
@@ -162,7 +169,7 @@ namespace spaceArchiver
 			q.~PriorityQueue();
 
 			cout << "     Tree is created" << endl;
-			cout << "3/9) Create Huffman codes" << endl;
+			cout << "4/6) Create Huffman codes" << endl;
 			
 			/// 4 step
 			spaceBitSet::BitSet bs; bs.Reserve(1);
@@ -172,7 +179,7 @@ namespace spaceArchiver
 			bs.~BitSet();
 
 			cout << "     Codes is created" << endl;
-			cout << "4/9) Write code-table to file" << endl;
+			cout << "5/6) Write code-table to file" << endl;
 
 			/// 5 step
 			// cnt_codes, max_bit_size, tree, arr
@@ -197,7 +204,7 @@ namespace spaceArchiver
 			arr.~Array();
 
 			cout << "     Code-table is written" << endl;
-			cout << "3/9) Write compressed file" << endl;
+			cout << "6/6) Write compressed file" << endl;
 
 
 			/// 6 step
@@ -247,7 +254,10 @@ namespace spaceArchiver
 			}
 			fin.close();
 			fout.close();
+			tree.~AVL_Tree();
+			temp_bs.~BitSet();
 			cout << "     File has already written" << endl;
+			*/
 		}
 
 	private:

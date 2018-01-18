@@ -16,10 +16,7 @@ namespace spacePriorityQueue
 		spaceArray::Array<Pair> arr;
 
 	public:
-		PriorityQueue()
-		{
-			this->arr.~Array();
-		}
+		PriorityQueue() = default;
 		~PriorityQueue()
 		{
 			this->arr.~Array();
@@ -41,7 +38,7 @@ namespace spacePriorityQueue
 		}
 		void Pop()
 		{
-			if (IsEmpty()) return;
+			if (this->arr.IsEmpty()) return;
 			size_t sz = this->arr.Size() - 1;
 			size_t i = 0;
 
@@ -81,7 +78,7 @@ namespace spacePriorityQueue
 		}
 		T1	 ExtractMin()
 		{
-			if (IsEmpty()) throw "Empty queue";
+			if (this->arr.IsEmpty()) throw "Empty queue";
 			return this->arr[0].data;
 		}
 		void ShrinkToFit()

@@ -11,14 +11,12 @@ namespace spaceBitSet
 	public:
 		BitSet()
 		{
-			if (this->byte_size) delete[] this->arr;
 			this->arr = nullptr;
 			this->bit_size = 0;
 			this->byte_size = 0;
 		}
 		BitSet(size_t bit_sz)
 		{
-			if (this->byte_size) delete[] this->arr;
 			size_t byte_sz = bit_sz / 8 + (bit_sz % 8 ? 1 : 0);
 			this->arr = new char[byte_size];
 			this->byte_size = byte_sz;
@@ -26,7 +24,6 @@ namespace spaceBitSet
 		}
 		BitSet(const BitSet &obj)
 		{
-			if (this->byte_size) delete[] this->arr;
 			this->byte_size = obj.byte_size;
 			this->bit_size = obj.bit_size;
 			this->arr = new char[this->byte_size];

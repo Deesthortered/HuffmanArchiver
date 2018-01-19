@@ -170,7 +170,7 @@ namespace spaceArchiver
 			cout << "4/6) Create Huffman codes" << endl;
 			
 			/// 4 step
-			spaceBitSet::BitSet bs; bs.Reserve(1);
+			spaceBitSet::BitSet bs;
 			unsigned char max_bit_size = Hufffunc(hufftree, bs, tree) - 1;
 			unsigned char max_byte_size = (max_bit_size >> 3) + ((max_bit_size - ((max_bit_size >> 3) << 3)) ? 1 : 0);
 			hufftree = nullptr;
@@ -391,11 +391,11 @@ namespace spaceArchiver
 					fin.read((char*)&tmp_original[j], sizeof(char));
 				fin.read((char*)&tmp_bit_size, sizeof(tmp_bit_size));
 				for (unsigned char j = 0; j < max_byte_size; j++)
-					fin.read((char*)&buff[i], sizeof(char));
+					fin.read(&buff[j], sizeof(char));
 				tmp_bs.SetMemory(buff, tmp_bit_size);
 				tree.Insert(DataNode(tmp_original, tmp_bit_size, buff));
 			}
-			//delete[] buff;
+			delete[] buff;
 			tmp_bs.~BitSet();
 
 			cout << "     Code-table is read" << endl;

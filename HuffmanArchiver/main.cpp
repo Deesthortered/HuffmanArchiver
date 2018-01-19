@@ -3,9 +3,14 @@
 #include "Archiver.h"
 using namespace std;
 
+void Show(spaceBitSet::BitSet bs)
+{
+	for (size_t i = 0; i < bs.BitSize(); i++)
+		cout << bs.GetValue(i); cout << endl;
+}
+
 int main()
 {	
-	/*
 	unsigned char byte = 1;
 	string input = "D://2.Programming//1.txt";
 	string output = "D://2.Programming//1.txt.compr";
@@ -19,32 +24,12 @@ int main()
 	if (!coder.Ready()) cout << "Error1!" << endl;
 	else coder.Run();
 
+	
 	spaceArchiver::Decoder decoder;
 	decoder.Initialize(output, output2);
 	if (!decoder.Ready()) cout << "Error2!" << endl;
-	else decoder.Run();*/
-
-	spaceBitSet::BitSet bs1, bs2;
-	bs1.Reserve(1);
-	bs2.Reserve(1);
-
-	bs1.PushBack(true);
-	bs1.PushBack(false);
-	bs1.PushBack(true);
-
-	bs2.PushBack(true);
-	bs2.PushBack(true);
-	bs2.PushBack(true);
-
-	for (size_t i = 0; i < bs1.BitSize(); i++)
-		cout << bs1.GetValue(i); cout << endl;
-	for (size_t i = 0; i < bs2.BitSize(); i++)
-		cout << bs2.GetValue(i); cout << endl << endl;
-
-	cout << (bs1 < bs2);
-	cout << (bs1 == bs2);
-	cout << (bs1 > bs2) << endl;
-
+	else decoder.Run();
+	
 	system("pause");
 	return 0;
 }

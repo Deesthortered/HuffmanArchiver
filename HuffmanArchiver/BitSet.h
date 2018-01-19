@@ -117,7 +117,8 @@ namespace spaceBitSet
 			{
 				this->arr = new char[1];
 				this->byte_size = 1;
-				SetValue(this->bit_size++, val);
+				this->bit_size = 1;
+				SetValue(0, val);
 				return;
 			}
 			if (this->bit_size < this->byte_size << 3)

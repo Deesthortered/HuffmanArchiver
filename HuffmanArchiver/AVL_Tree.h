@@ -1,7 +1,5 @@
 #pragma once
-#include <string>
 #include "PriorityQueue.h"
-using namespace std;
 
 namespace spaceAVL_Tree
 {

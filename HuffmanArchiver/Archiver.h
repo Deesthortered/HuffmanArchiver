@@ -109,7 +109,7 @@ namespace spaceArchiver
 		{
 			if (!this->ready) return;
 			/// 1 step
-			cout << "1/6) Initializing" << endl;
+			cout << "1/6) Coder initializing" << endl;
 
 			fstream fin(this->path_from, ios::binary | ios::in);
 			spaceAVL_Tree::AVL_Tree<DataNode> tree;
@@ -284,18 +284,49 @@ namespace spaceArchiver
 		{
 			string original;
 			spaceBitSet::BitSet bs;
+			DataNode()
+			{
+				this->original.clear();
+				this->bs.~BitSet();
+			}
 			DataNode(string _original, unsigned char _bit_size, char *bs_memory) : original(_original)
 			{
 				this->bs.SetMemory(bs_memory, _bit_size);
+			}
+			DataNode(spaceBitSet::BitSet _bs)
+			{
+				this->original.clear();
+				this->bs = _bs;
+			}
+			~DataNode()
+			{
+				original.clear();
+				bs.~BitSet();
 			}
 			friend bool operator< (DataNode &a, DataNode &b)
 			{
 				return a.bs < b.bs;
 			}
+			friend bool operator> (DataNode &a, DataNode &b)
+			{
+				return a.bs > b.bs;
+			}
+			bool operator == (DataNode &obj)
+			{
+				return (this->bs == obj.bs);
+			}
+			bool operator != (DataNode &obj)
+			{
+				return !(this->bs == obj.bs);
+			}
 			DataNode& operator=(DataNode &obj)
 			{
 				this->original = obj.original;
 				this->bs = obj.bs;
+				return *this;
+			}
+			DataNode& operator++()
+			{
 				return *this;
 			}
 		};
@@ -334,10 +365,13 @@ namespace spaceArchiver
 		}
 		void Run()
 		{
+			cout << "1/6) Decoder initializing" << endl;
 			unsigned __int32 cnt_codes;		// количество букв
 			unsigned char cnt_byte;			// вес одного куска-оригинала
 			unsigned char max_byte_size;	// количество байт для кода максимальной длины
 
+			cout << "2/6) Reading code-table" << endl;
+			/// step 1
 			fstream fin(this->path_from, ios::binary | ios::in);
 
 			fin.read((char*)&cnt_codes, sizeof(cnt_codes));
@@ -346,8 +380,11 @@ namespace spaceArchiver
 
 			string tmp_original; tmp_original.resize(cnt_codes);
 			char tmp_bit_size;
+
 			char *buff = new char[max_byte_size];
+
 			spaceBitSet::BitSet tmp_bs;
+			spaceAVL_Tree::AVL_Tree<DataNode> tree;
 			for (unsigned __int32 i = 0; i < cnt_codes; i++)
 			{
 				for (unsigned char j = 0; j < cnt_byte; j++) 
@@ -356,11 +393,42 @@ namespace spaceArchiver
 				for (unsigned char j = 0; j < max_byte_size; j++)
 					fin.read((char*)&buff[i], sizeof(char));
 				tmp_bs.SetMemory(buff, tmp_bit_size);
-				//map[tmp_bs] = Node(tmp_original, tmp_bit_size, buff);
+				tree.Insert(DataNode(tmp_original, tmp_bit_size, buff));
 			}
-			delete[] buff;
+			//delete[] buff;
+			tmp_bs.~BitSet();
 
+			cout << "     Code-table is read" << endl;
+			cout << "3/6) Reading compressed file and writing original" << endl;
+
+			/// step 2
+			fstream fout(this->path_to, ios::binary | ios::out);
+			tmp_bs.Reserve(max_byte_size << 2);
+			spaceBitSet::BitSet bs;
+			char c;
+			while (fin.read(&c, sizeof(c)))
+			{
+				bs.SetMemory(&c, 8);
+				tmp_bs.ConcatSet(bs);
+				while (tmp_bs.BitSize() >= max_byte_size)
+				{
+					size_t sz = tmp_bs.BitSize();
+					size_t temp_sz = sz;
+					while (temp_sz)
+					{
+						tmp_bs.Resize(temp_sz);
+						DataNode node = tree.FindVal(DataNode(tmp_bs));
+						if (node.original.empty()) { temp_sz--; continue; }
+						for (size_t i = 0; i < node.original.size(); i++)
+							fout.write((char*)&node.original[i], sizeof(char));
+						tmp_bs.Resize(sz);
+						tmp_bs.MoveLeft(temp_sz);
+					}
+				}
+			}
 			fin.close();
+			fout.close();
+			cout << "     Original file is writen" << endl;
 		}
 	};
 }

@@ -423,17 +423,17 @@ namespace spaceArchiver
 			cout << "     Code-table is read" << endl;
 			cout << "3/6) Reading compressed file and writing original" << endl;
 
-
 			/// step 2
 			fstream fout(this->path_to, ios::binary | ios::out);
 			spaceBitSet::BitSet tmp_bs;
-			tmp_bs.Reserve(max_byte_size << 2);
-			spaceBitSet::BitSet bs;
+			tmp_bs.Reserve(max_byte_size << 4);
 			char c;
 			while (fin.read(&c, sizeof(c)))
 			{
+				spaceBitSet::BitSet bs;
 				bs.SetMemory(&c, 8);
 				tmp_bs.ConcatSet(bs);
+				/*
 				while (tmp_bs.BitSize() >= max_byte_size)
 				{
 					size_t sz = tmp_bs.BitSize();
@@ -449,9 +449,15 @@ namespace spaceArchiver
 						tmp_bs.MoveLeft(temp_sz);
 					}
 				}
+				*/
 			}
 			fin.close();
 			fout.close();
+			{
+				cout << endl;
+				for (size_t k = 0; k < tmp_bs.BitSize(); k++)
+					cout << tmp_bs.GetValue(k); cout << endl << endl;
+			}
 			cout << "     Original file is writen" << endl << endl << endl;
 		}
 	};

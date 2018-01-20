@@ -3,12 +3,6 @@
 #include "Archiver.h"
 using namespace std;
 
-void Show(spaceBitSet::BitSet bs)
-{
-	for (size_t i = 0; i < bs.BitSize(); i++)
-		cout << bs.GetValue(i); cout << endl;
-}
-
 int main()
 {	
 	unsigned char byte = 1;

@@ -91,7 +91,7 @@ namespace spaceArray
 			this->arr = new_arr;
 		}
 
-		Array& operator=(Array obj)
+		Array& operator=(const Array &obj)
 		{
 			if (!obj.real_size) { this->~Array(); return *this; }
 			if (this->real_size) delete[] this->arr;

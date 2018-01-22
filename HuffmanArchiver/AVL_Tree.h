@@ -12,7 +12,6 @@ namespace spaceAVL_Tree
 			int height;
 			TreeNode *left;
 			TreeNode *right;
-			TreeNode *parent;
 			TreeNode(T _data) : data(_data), height(1), left(nullptr), right(nullptr) {}
 		};
 		TreeNode *main_root;

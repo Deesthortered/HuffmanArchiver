@@ -11,6 +11,9 @@ int main()
 		string output = "D://2.Programming//1.compr";
 		string output2 = "D://2.Programming//1(compr).txt";
 
+		remove(output.c_str());
+		remove(output2.c_str());
+
 		spaceArchiver::Coder coder;
 		coder.Initialize(input, output, byte);
 		if (!coder.Ready()) cout << "Error1!" << endl;

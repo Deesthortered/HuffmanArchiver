@@ -435,7 +435,7 @@ namespace spaceArchiver
 			cout << "*** Decoder ***" << endl;
 			cout << "1/3) Decoder initializing" << endl;
 
-			this->path_to += "/" + this->path_from.substr(this->path_from.rfind('/') + 1) + "(decompressed)";
+			this->path_to += "/" + this->path_from.substr(this->path_from.rfind('/') + 1) + "(decompressed)/";
 			
 			unsigned __int32 cnt_codes;		// количество букв
 			unsigned __int32 cnt_files;		// количество файлов
@@ -462,10 +462,11 @@ namespace spaceArchiver
 				fin.read(&buff[j], sizeof(char));
 			spaceBitSet::BitSet end_bs; end_bs.SetMemory(buff, end_sz);
 
+			/*
 			cout << "EOF ";
 			for (size_t k = 0; k < end_bs.BitSize(); k++)
 				cout << end_bs.GetValue(k); cout << endl;
-
+				*/
 			spaceAVL_Tree::AVL_Tree<DataNode> tree;
 			for (unsigned __int32 i = 0; i < cnt_codes; i++)
 			{
@@ -476,39 +477,96 @@ namespace spaceArchiver
 					fin.read(&buff[j], sizeof(char));
 				tree.Insert(DataNode(tmp_original, tmp_bit_size, buff));
 
+				/*
 				spaceBitSet::BitSet bsss; bsss.SetMemory(buff, tmp_bit_size);
 				cout << tmp_original.c_str() << " ";
 				for (size_t k = 0; k < bsss.BitSize(); k++)
 					cout << bsss.GetValue(k); cout << endl << endl;
-
+				*/
 			}
 			delete[] buff;
 
 			cout << "     Code-table is read" << endl;
 			cout << "3/3) Reading compressed file and writing originals" << endl;
 
-			if (_mkdir(this->path_to.c_str())) { cout << "Error! Can't create directory." << endl; };
+			if (_mkdir(this->path_to.c_str())) { cout << "Error! Can't create directory." << endl; return; };
 			/// step 2
 			spaceBitSet::BitSet tmp_bs;
 			tmp_bs.Reserve(max_byte_size << 4);
 			
-
-			fstream fout(this->path_to, ios::binary | ios::out);
-			char c;
-			while (fin.read(&c, sizeof(c)))
+			
+			char c; size_t eof_number = 0;
+			vector<string> names(cnt_files);
+			while (eof_number < cnt_files && fin.read(&c, sizeof(c)))
 			{
 				spaceBitSet::BitSet bs;
 				bs.SetMemory(&c, 8);
 				tmp_bs.ConcatSet(bs);
 				while (tmp_bs.BitSize() >= (size_t)(max_byte_size << 3))
 				{
-
+					size_t tmp_sz = tmp_bs.BitSize();
+					for (size_t i = 1; eof_number < cnt_files && i <= tmp_sz; i++)
+					{
+						tmp_bs.Resize(i);
+						DataNode node = tree.FindVal(DataNode(tmp_bs));
+						if (!node.original.empty())
+						{
+							tmp_bs.Resize(tmp_sz);
+							tmp_bs.MoveLeft(i);
+							names[eof_number] += node.original;
+							break;
+						}
+						if (tmp_bs == end_bs)
+						{
+							tmp_bs.Resize(tmp_sz);
+							tmp_bs.MoveLeft(i);
+							fstream f(this->path_to + names[eof_number], ios_base::binary | ios_base::out);
+							f.close();
+							eof_number++;
+							break;
+						}
+					}
 				}
 			}
+			eof_number = 0;
+			fstream fout(this->path_to + names[eof_number], ios_base::binary | ios_base::out);
+			while (eof_number < cnt_files && fin.read(&c, sizeof(c)))
 			{
+				spaceBitSet::BitSet bs;
+				bs.SetMemory(&c, 8);
+				tmp_bs.ConcatSet(bs);
+				while (tmp_bs.BitSize() >= (size_t)(max_byte_size << 3))
+				{
+					size_t tmp_sz = tmp_bs.BitSize();
+					for (size_t i = 1; eof_number < cnt_files && i <= tmp_sz; i++)
+					{
+						tmp_bs.Resize(i);
+						DataNode node = tree.FindVal(DataNode(tmp_bs));
+						if (!node.original.empty())
+						{
+							tmp_bs.Resize(tmp_sz);
+							tmp_bs.MoveLeft(i);
+							for (size_t j = 0; j < node.original.size(); j++)
+								fout.write((char*)&node.original[j], sizeof(char));
+							break;
+						}
+						if (tmp_bs == end_bs)
+						{
+							tmp_bs.Resize(tmp_sz);
+							tmp_bs.MoveLeft(i);
+							eof_number++;
+							fout.close();
+							if (eof_number < cnt_files)
+								fout.open(this->path_to + names[eof_number], ios_base::binary | ios_base::out);
+							break;
+						}
+					}
+				}
 			}
-			fout.close();
-
+			/*
+			for (size_t k = 0; k < tmp_bs.BitSize(); k++)
+				cout << tmp_bs.GetValue(k); cout << endl << endl;
+				*/
 			fin.close();
 
 			cout << "     Original files is writen" << endl << endl << endl;

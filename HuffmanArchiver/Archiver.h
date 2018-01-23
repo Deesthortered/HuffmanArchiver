@@ -215,6 +215,13 @@ namespace spaceArchiver
 			for (size_t i = 0; i < max_byte_size; i++)
 				fout.write((char*)&buff[i], sizeof(char));
 
+			/*
+			cout << "EOF ";
+			for (size_t k = 0; k < end_bs.BitSize(); k++)
+				cout << end_bs.GetValue(k); cout << endl;
+			spaceBitSet::BitSet dg1;
+			*/
+
 			// Запись остальной таблици
 			for (size_t i = 0; i < arr.Size(); i++)
 			{
@@ -225,6 +232,12 @@ namespace spaceArchiver
 				arr[i].bs.GetMemory(buff);
 				for (size_t j = 0; j < max_byte_size; j++)
 					fout.write((char*)&buff[j], sizeof(char));
+
+				/*
+				cout << arr[i].data.c_str() << " ";
+				for (size_t k = 0; k < arr[i].bs.BitSize(); k++)
+					cout << arr[i].bs.GetValue(k); cout << endl;
+				*/
 			}
 			delete[] buff;
 			arr.~Array();
@@ -233,16 +246,17 @@ namespace spaceArchiver
 			cout << "6/6) Write compressed file" << endl;
 
 			/// 6 step
-			spaceBitSet::BitSet temp_bs;
+			spaceBitSet::BitSet temp_bs;// , dg;
 			temp_bs.Reserve((max_bit_size < 8 ? 8 : max_bit_size) << 1);
+
 			for (size_t k = 0; k < (size_t)cnt_files; k++)
 			{
-				char c; string word; size_t _i = 0;
 				// Write name
 				for (size_t j = 0; j < names[k].size(); j += this->cnt_byte)
 				{
 					spaceBitSet::BitSet a = tree.FindVal(names[k].substr(j, this->cnt_byte)).bs;
 					temp_bs.ConcatSet(a);
+					//dg.ConcatSet(a);
 					while (temp_bs.BitSize() >= 8)
 					{
 						char c = temp_bs.GetFirstByte();
@@ -251,6 +265,11 @@ namespace spaceArchiver
 					}
 				}
 				temp_bs.ConcatSet(end_bs);
+				//dg.ConcatSet(end_bs);
+			}
+			for (size_t k = 0; k < (size_t)cnt_files; k++)
+			{
+				char c; string word; size_t _i = 0;
 				// Write file
 				fstream fin(this->path_from[k], ios::binary | ios::in);
 				while (fin.read(&c, sizeof(c)))
@@ -260,6 +279,7 @@ namespace spaceArchiver
 					{
 						spaceBitSet::BitSet tmp = tree.FindVal(DataNode(word)).bs;
 						temp_bs.ConcatSet(tmp);
+						//dg.ConcatSet(tmp);
 						word.clear();
 						_i = 0;
 						while (temp_bs.BitSize() >= 8)
@@ -275,25 +295,33 @@ namespace spaceArchiver
 				{
 					spaceBitSet::BitSet tmp = tree.FindVal(DataNode(word)).bs;
 					temp_bs.ConcatSet(tmp);
+					//dg.ConcatSet(tmp);
 					word.clear();
 					_i = 0;
 				}
 				temp_bs.ConcatSet(end_bs);
+				//dg.ConcatSet(end_bs);
 				while (temp_bs.BitSize() >= 8)
 				{
 					char c = temp_bs.GetFirstByte();
 					fout.write(&c, sizeof(char));
 					temp_bs.MoveLeft(8);
 				}
-				if ((k+1 == cnt_files) && temp_bs.BitSize()) // for last file
-				{
-					size_t tmp = 8 - temp_bs.BitSize();
-					for (size_t i = 0; i < tmp; i++)  temp_bs.PushBack(false);
-					char c = temp_bs.GetFirstByte();
-					fout.write(&c, sizeof(char));
-				}
+			}
+			if (temp_bs.BitSize()) // for last file
+			{
+				size_t tmp = 8 - temp_bs.BitSize();
+				for (size_t i = 0; i < tmp; i++) { temp_bs.PushBack(false); /*dg.PushBack(false);*/}
+				char c = temp_bs.GetFirstByte();
+				fout.write(&c, sizeof(char));
 			}
 			fout.close();
+			/*
+			for (size_t k = 0; k < dg.BitSize(); k++)
+				cout << dg.GetValue(k); cout << endl;
+			for (size_t k = 0; k < temp_bs.BitSize(); k++)
+				cout << temp_bs.GetValue(k); cout << endl;
+			*/
 			cout << "     File have already written" << endl << endl << endl;
 		}
 	private:
@@ -433,6 +461,11 @@ namespace spaceArchiver
 			for (unsigned char j = 0; j < max_byte_size; j++)
 				fin.read(&buff[j], sizeof(char));
 			spaceBitSet::BitSet end_bs; end_bs.SetMemory(buff, end_sz);
+
+			cout << "EOF ";
+			for (size_t k = 0; k < end_bs.BitSize(); k++)
+				cout << end_bs.GetValue(k); cout << endl;
+
 			spaceAVL_Tree::AVL_Tree<DataNode> tree;
 			for (unsigned __int32 i = 0; i < cnt_codes; i++)
 			{
@@ -442,13 +475,19 @@ namespace spaceArchiver
 				for (unsigned char j = 0; j < max_byte_size; j++)
 					fin.read(&buff[j], sizeof(char));
 				tree.Insert(DataNode(tmp_original, tmp_bit_size, buff));
+
+				spaceBitSet::BitSet bsss; bsss.SetMemory(buff, tmp_bit_size);
+				cout << tmp_original.c_str() << " ";
+				for (size_t k = 0; k < bsss.BitSize(); k++)
+					cout << bsss.GetValue(k); cout << endl << endl;
+
 			}
 			delete[] buff;
 
 			cout << "     Code-table is read" << endl;
 			cout << "3/3) Reading compressed file and writing originals" << endl;
 
-			if (!_mkdir(this->path_to.c_str())) { cout << "Error! Can't create directory." << endl; };
+			if (_mkdir(this->path_to.c_str())) { cout << "Error! Can't create directory." << endl; };
 			/// step 2
 			spaceBitSet::BitSet tmp_bs;
 			tmp_bs.Reserve(max_byte_size << 4);
@@ -461,42 +500,14 @@ namespace spaceArchiver
 				spaceBitSet::BitSet bs;
 				bs.SetMemory(&c, 8);
 				tmp_bs.ConcatSet(bs);
-				while (tmp_bs.BitSize() >= (size_t)(max_byte_size << 4))
+				while (tmp_bs.BitSize() >= (size_t)(max_byte_size << 3))
 				{
-					size_t sz = tmp_bs.BitSize();
-					size_t temp_sz = sz;
-					while (temp_sz)
-					{
-						tmp_bs.Resize(temp_sz);
-						DataNode node = tree.FindVal(DataNode(tmp_bs));
-						if (node.original.empty()) { temp_sz--; if (!temp_sz) tmp_bs.Resize(sz); continue; }
-						for (size_t i = 0; i < node.original.size(); i++)
-							fout.write((char*)&node.original[i], sizeof(char));
-						tmp_bs.Resize(sz);
-						tmp_bs.MoveLeft(temp_sz);
-						sz = tmp_bs.BitSize();
-						temp_sz = sz;
-					}
+
 				}
 			}
 			{
-				size_t sz = tmp_bs.BitSize();
-				size_t temp_sz = sz;
-				while (temp_sz)
-				{
-					tmp_bs.Resize(temp_sz);
-					DataNode node = tree.FindVal(DataNode(tmp_bs));
-					if (node.original.empty()) { temp_sz--; if (!temp_sz) tmp_bs.Resize(sz); continue; }
-					for (size_t i = 0; i < node.original.size(); i++)
-						fout.write((char*)&node.original[i], sizeof(char));
-					tmp_bs.Resize(sz);
-					tmp_bs.MoveLeft(temp_sz);
-					sz = tmp_bs.BitSize();
-					temp_sz = sz;
-				}
 			}
 			fout.close();
-
 
 			fin.close();
 

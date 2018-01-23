@@ -8,11 +8,14 @@ int main()
 {	
 	{
 		unsigned char byte = 1;
-		vector<string> input(3);
+		vector<string> input(6);
 		{
-			input[0] = "D:/2.Programming/темпик/1.pdf";
-			input[1] = "D:/2.Programming/темпик/1.jpg";
-			input[2] = "D:/2.Programming/темпик/1.txt";
+			input[0] = "D:/2.Programming/темпик/1.txt";
+			input[1] = "D:/2.Programming/темпик/2.txt";
+			input[2] = "D:/2.Programming/темпик/3.txt";
+			input[3] = "D:/2.Programming/темпик/4.txt";
+			input[4] = "D:/2.Programming/темпик/1.jpg";
+			input[5] = "D:/2.Programming/темпик/1.pdf";
 		}
 		string output = "D:/2.Programming/темпик/1.compr";
 		string output2 = "D:/2.Programming/темпик";

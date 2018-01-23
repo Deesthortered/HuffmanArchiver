@@ -270,9 +270,13 @@ namespace spaceBitSet
 		bool operator == (BitSet &obj)
 		{
 			if (this->bit_size != obj.bit_size) return false;
-			for (register size_t i = 0; i < this->bit_size; i++)
-				if (this->GetValue(i) != obj.GetValue(i)) return false;
-			return true;
+			size_t i1 = this->bit_size >> 3;
+			for (register size_t i = 0; i < i1; i++)
+				if (this->arr[i] != obj.arr[i]) return false;
+			size_t i2 = this->bit_size - ((this->bit_size >> 3) << 3);
+			if (!i2) return true;
+			char c = (-128 >> (i2 - 1));
+			return (this->arr[i1] & c) == (obj.arr[i1] & c);
 		}
 	};
 }

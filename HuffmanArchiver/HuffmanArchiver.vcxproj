@@ -114,16 +114,6 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="main.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Archiver.h" />
-    <ClInclude Include="Array.h" />
-    <ClInclude Include="AVL_Tree.h" />
-    <ClInclude Include="BitSet.h" />
-    <ClInclude Include="PriorityQueue.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

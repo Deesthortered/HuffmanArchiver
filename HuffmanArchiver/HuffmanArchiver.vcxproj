@@ -18,6 +18,16 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Archiver.h" />
+    <ClInclude Include="Array.h" />
+    <ClInclude Include="AVL_Tree.h" />
+    <ClInclude Include="BitSet.h" />
+    <ClInclude Include="PriorityQueue.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{A6D0DFF2-DD79-4CAE-804D-6F4ECF84A244}</ProjectGuid>

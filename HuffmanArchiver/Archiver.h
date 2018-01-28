@@ -261,7 +261,7 @@ namespace spaceArchiver
 					{
 						char c = temp_bs.GetFirstByte();
 						fout.write(&c, sizeof(char));
-						temp_bs.MoveLeft(8);
+						temp_bs.RemovePrefix(8);
 					}
 				}
 				temp_bs.ConcatSet(end_bs);
@@ -286,7 +286,7 @@ namespace spaceArchiver
 						{
 							char c = temp_bs.GetFirstByte();
 							fout.write(&c, sizeof(char));
-							temp_bs.MoveLeft(8);
+							temp_bs.RemovePrefix(8);
 						}
 					}
 				}
@@ -305,7 +305,7 @@ namespace spaceArchiver
 				{
 					char c = temp_bs.GetFirstByte();
 					fout.write(&c, sizeof(char));
-					temp_bs.MoveLeft(8);
+					temp_bs.RemovePrefix(8);
 				}
 			}
 			if (temp_bs.BitSize()) // for last file
@@ -512,14 +512,14 @@ namespace spaceArchiver
 						if (!node.original.empty())
 						{
 							tmp_bs.Resize(tmp_sz);
-							tmp_bs.MoveLeft(i);
+							tmp_bs.RemovePrefix(i);
 							names[eof_number] += node.original;
 							break;
 						}
 						if (tmp_bs == end_bs)
 						{
 							tmp_bs.Resize(tmp_sz);
-							tmp_bs.MoveLeft(i);
+							tmp_bs.RemovePrefix(i);
 							fstream f(this->path_to + names[eof_number], ios_base::binary | ios_base::out);
 							f.close();
 							eof_number++;
@@ -545,7 +545,7 @@ namespace spaceArchiver
 						if (!node.original.empty())
 						{
 							tmp_bs.Resize(tmp_sz);
-							tmp_bs.MoveLeft(i);
+							tmp_bs.RemovePrefix(i);
 							for (size_t j = 0; j < node.original.size(); j++)
 								fout.write((char*)&node.original[j], sizeof(char));
 							break;
@@ -553,7 +553,7 @@ namespace spaceArchiver
 						if (tmp_bs == end_bs)
 						{
 							tmp_bs.Resize(tmp_sz);
-							tmp_bs.MoveLeft(i);
+							tmp_bs.RemovePrefix(i);
 							eof_number++;
 							fout.close();
 							if (eof_number < cnt_files)
